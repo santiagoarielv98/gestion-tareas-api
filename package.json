@@ -1,7 +1,7 @@
 {
-  "name": "gestion-tareas",
+  "name": "gestion-tareas-api",
   "version": "0.0.1",
-  "description": "",
+  "description": "Una API para gestionar tareas",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
