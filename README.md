@@ -32,14 +32,14 @@ API para la gestión de tareas, permite crear, editar, eliminar y listar tareas.
 
 ```bash
 # Instalar dependencias
-$ npm install
+$ pnpm install
 
 # Ejecutar aplicación
-$ npm run start
+$ pnpm run start
 
 # Ejecutar aplicación en modo desarrollo
-$ npm run start:dev
+$ pnpm run start:dev
 
 # Ejecutar aplicación en modo producción
-$ npm run start:prod
+$ pnpm run start:prod
 ```
