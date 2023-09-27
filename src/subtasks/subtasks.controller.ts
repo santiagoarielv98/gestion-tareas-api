@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { SubtasksService } from './subtasks.service';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { CreateSubtaskDto } from './dto/create-subtask.dto';
 import { UpdateSubtaskDto } from './dto/update-subtask.dto';
+import { SubtasksService } from './subtasks.service';
 
 @Controller('subtasks')
 export class SubtasksController {
@@ -22,7 +22,7 @@ export class SubtasksController {
     return this.subtasksService.findOne(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateSubtaskDto: UpdateSubtaskDto) {
     return this.subtasksService.update(id, updateSubtaskDto);
   }

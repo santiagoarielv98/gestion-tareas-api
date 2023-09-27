@@ -21,6 +21,7 @@ export class ColumnsService {
   findAll() {
     return this.columnModel
       .find()
+      .sort('position')
       .populate({
         path: 'tasks',
         populate: {
@@ -34,8 +35,12 @@ export class ColumnsService {
     return this.columnModel.findById(id).populate('tasks').exec();
   }
 
-  update(id: string, updateColumnDto: UpdateColumnDto) {
-    return this.columnModel.findByIdAndUpdate(id, updateColumnDto, { new: true }).exec();
+  async update(id: string, updateColumnDto: UpdateColumnDto) {
+    const { source, destination, ...update } = updateColumnDto;
+    if (source.index !== destination.index) {
+      await this.columnModel.findOneAndUpdate({ position: destination.index }, { position: source.index }).exec();
+      await this.columnModel.findByIdAndUpdate(id, { ...update, position: destination.index }).exec();
+    }
   }
 
   remove(id: string) {
