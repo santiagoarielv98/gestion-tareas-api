@@ -6,4 +6,5 @@ export class CreateTaskDto {
   done: boolean;
   position: number;
   subtasks: CreateSubtaskDto[];
+  column: string;
 }

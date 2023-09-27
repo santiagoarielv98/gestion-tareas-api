@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateTaskDto } from './dto/create-task.dto';
-import { Task } from './schemas/task.schema';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { Task } from './schemas/task.schema';
 import { Column } from 'src/columns/schemas/column.schema';
 
 @Injectable()
@@ -14,14 +14,22 @@ export class TasksService {
   ) {}
 
   async create(createTaskDto: CreateTaskDto): Promise<Task> {
-    const count = await this.taskModel.countDocuments().exec();
+    const count = await this.taskModel.countDocuments({ column: createTaskDto.column });
 
     const newTask = await new this.taskModel({
       ...createTaskDto,
       position: count,
     }).save();
 
-    await this.columnModel.findByIdAndUpdate(newTask.column, { $push: { tasks: newTask._id } }, { new: true });
+    await this.columnModel.findByIdAndUpdate(
+      newTask.column,
+      {
+        $push: {
+          tasks: newTask._id,
+        },
+      },
+      { new: true },
+    );
 
     return newTask;
   }
