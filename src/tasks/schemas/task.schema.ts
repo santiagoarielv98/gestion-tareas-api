@@ -6,7 +6,7 @@ import { Subtask } from 'src/subtasks/schemas/subtask.schema';
 export type TaskDocument = HydratedDocument<Task>;
 
 @Schema()
-export class Task {
+export class Task extends mongoose.Document {
   @Prop({ required: true })
   title: string;
 

@@ -27,6 +27,9 @@ export class ColumnsService {
         populate: {
           path: 'subtasks',
         },
+        options: {
+          sort: 'position',
+        },
       })
       .exec();
   }
