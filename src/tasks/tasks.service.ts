@@ -35,11 +35,11 @@ export class TasksService {
   }
 
   findAll() {
-    return this.taskModel.find().exec();
+    return this.taskModel.find().populate('subtasks').exec();
   }
 
   findOne(id: string) {
-    return this.taskModel.findById(id).exec();
+    return this.taskModel.findById(id).populate('subtasks').exec();
   }
 
   update(id: string, updateTaskDto: UpdateTaskDto) {

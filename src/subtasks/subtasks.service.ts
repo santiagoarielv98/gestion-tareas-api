@@ -25,7 +25,7 @@ export class SubtasksService {
       newSubtask.task,
       {
         $push: {
-          tasks: newSubtask._id,
+          subtasks: newSubtask._id,
         },
       },
       { new: true },
