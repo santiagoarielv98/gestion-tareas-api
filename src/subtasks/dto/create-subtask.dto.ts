@@ -1,1 +1,5 @@
-export class CreateSubtaskDto {}
+export class CreateSubtaskDto {
+  _id: string;
+  title: string;
+  done: boolean;
+}

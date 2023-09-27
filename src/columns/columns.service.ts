@@ -1,26 +1,44 @@
 import { Injectable } from '@nestjs/common';
 import { CreateColumnDto } from './dto/create-column.dto';
 import { UpdateColumnDto } from './dto/update-column.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Column } from './schemas/column.schema';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class ColumnsService {
-  create(createColumnDto: CreateColumnDto) {
-    return 'This action adds a new column';
+  constructor(@InjectModel(Column.name) private columnModel: Model<Column>) {}
+
+  async create(createColumnDto: CreateColumnDto): Promise<Column> {
+    const count = await this.columnModel.countDocuments().exec();
+
+    return new this.columnModel({
+      ...createColumnDto,
+      position: count,
+    }).save();
   }
 
   findAll() {
-    return `This action returns all columns`;
+    return this.columnModel
+      .find()
+      .populate({
+        path: 'tasks',
+        populate: {
+          path: 'subtasks',
+        },
+      })
+      .exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} column`;
+  findOne(id: string) {
+    return this.columnModel.findById(id).populate('tasks').exec();
   }
 
-  update(id: number, updateColumnDto: UpdateColumnDto) {
-    return `This action updates a #${id} column`;
+  update(id: string, updateColumnDto: UpdateColumnDto) {
+    return this.columnModel.findByIdAndUpdate(id, updateColumnDto, { new: true }).exec();
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} column`;
+  remove(id: string) {
+    return this.columnModel.findByIdAndDelete(id).exec();
   }
 }

@@ -6,7 +6,7 @@ import { SubtasksModule } from './subtasks/subtasks.module';
 import { ColumnsModule } from './columns/columns.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), DatabaseModule, TasksModule, SubtasksModule, ColumnsModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), DatabaseModule, SubtasksModule, ColumnsModule, TasksModule],
   controllers: [],
   providers: [],
 })

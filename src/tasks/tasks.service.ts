@@ -4,13 +4,26 @@ import { Model } from 'mongoose';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './schemas/task.schema';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { Column } from 'src/columns/schemas/column.schema';
 
 @Injectable()
 export class TasksService {
-  constructor(@InjectModel(Task.name) private taskModel: Model<Task>) {}
+  constructor(
+    @InjectModel(Task.name) private taskModel: Model<Task>,
+    @InjectModel(Column.name) private columnModel: Model<Column>,
+  ) {}
 
-  create(createTaskDto: CreateTaskDto): Promise<Task> {
-    return new this.taskModel(createTaskDto).save();
+  async create(createTaskDto: CreateTaskDto): Promise<Task> {
+    const count = await this.taskModel.countDocuments().exec();
+
+    const newTask = await new this.taskModel({
+      ...createTaskDto,
+      position: count,
+    }).save();
+
+    await this.columnModel.findByIdAndUpdate(newTask.column, { $push: { tasks: newTask._id } }, { new: true });
+
+    return newTask;
   }
 
   findAll() {
