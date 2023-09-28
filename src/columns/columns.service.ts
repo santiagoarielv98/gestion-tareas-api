@@ -38,12 +38,20 @@ export class ColumnsService {
     return this.columnModel.findById(id).populate('tasks').exec();
   }
 
-  async update(id: string, updateColumnDto: UpdateColumnDto) {
-    const { source, destination, ...update } = updateColumnDto;
-    if (source.index !== destination.index) {
-      await this.columnModel.findOneAndUpdate({ position: destination.index }, { position: source.index }).exec();
-      await this.columnModel.findByIdAndUpdate(id, { ...update, position: destination.index }).exec();
-    }
+  async updatePositionColumn(id: string, { source, destination }: UpdateColumnDto) {
+    const sourceUpdate = {
+      updateOne: {
+        filter: { position: destination.index },
+        update: { position: source.index },
+      },
+    };
+    const destinationUpdate = {
+      updateOne: {
+        filter: { _id: id },
+        update: { position: destination.index },
+      },
+    };
+    await this.columnModel.bulkWrite([sourceUpdate, destinationUpdate]);
   }
 
   remove(id: string) {
