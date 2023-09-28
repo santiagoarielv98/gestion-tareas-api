@@ -1,21 +1,17 @@
-import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Task } from 'src/tasks/schemas/task.schema';
 import { CreateSubtaskDto } from './dto/create-subtask.dto';
 import { UpdateSubtaskDto } from './dto/update-subtask.dto';
 import { Subtask } from './schemas/subtask.schema';
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
-import { Task } from 'src/tasks/schemas/task.schema';
 
 @Injectable()
-export class SubtasksService implements OnApplicationBootstrap {
+export class SubtasksService {
   constructor(
     @InjectModel(Subtask.name) private subtaskModel: Model<Subtask>,
     @InjectModel(Task.name) private taskModel: Model<Task>,
   ) {}
-
-  async onApplicationBootstrap() {
-    await this.subtaskModel.deleteMany({}).exec();
-  }
 
   async create(createSubtaskDto: CreateSubtaskDto) {
     const count = await this.subtaskModel.countDocuments({ task: createSubtaskDto.task });
