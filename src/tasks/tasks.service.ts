@@ -42,7 +42,18 @@ export class TasksService {
     return this.taskModel.findById(id).populate('subtasks').exec();
   }
 
-  async update(id: string, updateTaskDto: UpdateTaskDto) {}
+  async updatePositionTask(id: string, { destination, source }: UpdateTaskDto) {
+    if (destination.droppableId === source.droppableId) {
+      await this.taskModel.updateOne(
+        {
+          column: destination.droppableId,
+          position: source.index,
+        },
+        { $set: { position: destination.index } },
+      );
+      await this.taskModel.findByIdAndUpdate(id, { $set: { position: destination.index } });
+    }
+  }
 
   remove(id: string) {
     return this.taskModel.findByIdAndDelete(id).exec();
