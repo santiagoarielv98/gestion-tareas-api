@@ -1,12 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { CreateColumnDto } from './dto/create-column.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Column } from './schemas/column.schema';
 import { Model } from 'mongoose';
 
 @Injectable()
-export class ColumnsService {
+export class ColumnsService implements OnApplicationBootstrap {
   constructor(@InjectModel(Column.name) private columnModel: Model<Column>) {}
+
+  async onApplicationBootstrap() {
+    await this.columnModel.deleteMany({}).exec();
+  }
 
   async create(createColumnDto: CreateColumnDto): Promise<Column> {
     const count = await this.columnModel.countDocuments().exec();

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -7,11 +7,15 @@ import { Task } from './schemas/task.schema';
 import { Column } from 'src/columns/schemas/column.schema';
 
 @Injectable()
-export class TasksService {
+export class TasksService implements OnApplicationBootstrap {
   constructor(
     @InjectModel(Task.name) private taskModel: Model<Task>,
     @InjectModel(Column.name) private columnModel: Model<Column>,
   ) {}
+
+  async onApplicationBootstrap() {
+    await this.taskModel.deleteMany({}).exec();
+  }
 
   async create(createTaskDto: CreateTaskDto): Promise<Task> {
     const count = await this.taskModel.countDocuments({ column: createTaskDto.column });
@@ -42,7 +46,9 @@ export class TasksService {
     return this.taskModel.findById(id).populate('subtasks').exec();
   }
 
-  async update(id: string, updateTaskDto: UpdateTaskDto) {}
+  async update(id: string, updateTaskDto: UpdateTaskDto) {
+    return this.taskModel.findByIdAndUpdate(id, updateTaskDto).exec();
+  }
 
   remove(id: string) {
     return this.taskModel.findByIdAndDelete(id).exec();
