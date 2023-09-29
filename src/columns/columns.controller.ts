@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { ColumnsService } from './columns.service';
 import { CreateColumnDto } from './dto/create-column.dto';
+import { UpdateColumnPositionDto } from './dto/update-column.dto';
 
 @Controller('columns')
 export class ColumnsController {
@@ -27,8 +28,8 @@ export class ColumnsController {
   }
 
   @Put(':id/position')
-  updatePosition(@Param('id') id: string, @Body() updateColumnDto: CreateColumnDto) {
-    return this.columnsService.updatePosition(id, updateColumnDto);
+  updatePosition(@Param('id') id: string, @Body() UpdateColumnPosition: UpdateColumnPositionDto) {
+    return this.columnsService.updatePosition(id, UpdateColumnPosition);
   }
 
   @Delete(':id')

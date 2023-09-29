@@ -5,11 +5,9 @@ export class UpdateColumnDto extends PartialType(CreateColumnDto) {}
 
 export class UpdateColumnPositionDto {
   source: {
-    droppableId: string;
     index: number;
   };
   destination: {
-    droppableId: string;
     index: number;
   };
 }

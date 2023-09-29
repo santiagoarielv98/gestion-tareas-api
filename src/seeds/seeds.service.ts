@@ -21,14 +21,22 @@ export class SeedsService implements OnApplicationBootstrap {
       {
         title: 'To do',
         description: 'Tasks to do',
+        position: 0,
       },
       {
         title: 'In progress',
         description: 'Tasks in progress',
+        position: 1,
+      },
+      {
+        title: 'Blocked',
+        description: 'Tasks blocked',
+        position: 2,
       },
       {
         title: 'Done',
         description: 'Tasks done',
+        position: 3,
       },
     ]);
 
@@ -53,10 +61,44 @@ export class SeedsService implements OnApplicationBootstrap {
       },
     ]);
 
+    const subtasksForTask1 = await this.subtaskModel.create([
+      {
+        title: 'Subtask 1 for task 1',
+        description: 'Subtask 1 for task 1 description',
+        task: tasks[0]._id,
+        position: tasks[0].subtasks.length,
+      },
+      {
+        title: 'Subtask 2 for task 1',
+        description: 'Subtask 2 for task 1 description',
+        task: tasks[0]._id,
+        position: tasks[0].subtasks.length,
+      },
+    ]);
+
+    const subtasksForTask2 = await this.subtaskModel.create([
+      {
+        title: 'Subtask 1 for task 2',
+        description: 'Subtask 1 for task 2 description',
+        task: tasks[1]._id,
+        position: tasks[1].subtasks.length,
+      },
+      {
+        title: 'Subtask 2 for task 2',
+        description: 'Subtask 2 for task 2 description',
+        task: tasks[1]._id,
+        position: tasks[1].subtasks.length,
+      },
+    ]);
+
+    tasks[0].subtasks = subtasksForTask1;
+    tasks[1].subtasks = subtasksForTask2;
+
     columns[0].tasks.push(tasks[0]._id);
     columns[1].tasks.push(tasks[1]._id);
     columns[2].tasks.push(tasks[2]._id);
 
     await Promise.all([columns[0].save(), columns[1].save(), columns[2].save()]);
+    await Promise.all([tasks[0].save(), tasks[1].save()]);
   }
 }
