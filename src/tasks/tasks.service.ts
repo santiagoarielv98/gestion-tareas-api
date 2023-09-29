@@ -106,7 +106,6 @@ export class TasksService {
 
   async move(moveTaskDto: MoveTaskDto) {
     const { source, destination } = moveTaskDto;
-
     if (source.droppableId === destination.droppableId) {
       await this.moveInColumn(moveTaskDto);
     } else {

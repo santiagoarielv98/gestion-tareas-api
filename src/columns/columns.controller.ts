@@ -29,7 +29,7 @@ export class ColumnsController {
 
   @Put(':id/position')
   updatePosition(@Param('id') id: string, @Body() UpdateColumnPosition: UpdateColumnPositionDto) {
-    return this.columnsService.updatePosition(id, UpdateColumnPosition);
+    return this.columnsService.updatePosition(UpdateColumnPosition);
   }
 
   @Delete(':id')

@@ -45,7 +45,7 @@ export class ColumnsService {
     return this.columnModel.findByIdAndUpdate(id, updateColumnDto).exec();
   }
 
-  async updatePosition(id: string, updateColumnDto: UpdateColumnPositionDto) {
+  async updatePosition(updateColumnDto: UpdateColumnPositionDto) {
     const { source, destination } = updateColumnDto;
 
     const columns = await this.columnModel.find().sort('position').exec();

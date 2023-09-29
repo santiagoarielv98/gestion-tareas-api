@@ -29,7 +29,7 @@ export class TasksController {
 
   @Put(':id/position')
   move(@Param('id') id: string, @Body() moveTaskDto: MoveTaskDto) {
-    return this.tasksService.move(id, moveTaskDto);
+    return this.tasksService.move(moveTaskDto);
   }
 
   @Delete(':id')
