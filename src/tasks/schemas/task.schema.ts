@@ -19,7 +19,7 @@ export class Task extends mongoose.Document {
   @Prop()
   position: number;
 
-  @Prop({ type: [{ type: 'ObjectId', ref: 'Subtask' }] })
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Subtask' }] })
   subtasks: Subtask[];
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Column', required: true })

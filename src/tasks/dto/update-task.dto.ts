@@ -11,3 +11,14 @@ export class UpdateTaskDto extends PartialType(CreateTaskDto) {
     droppableId: string;
   };
 }
+
+export class MoveTaskDto {
+  source: {
+    index: number;
+    droppableId: string;
+  };
+  destination: {
+    index: number;
+    droppableId: string;
+  };
+}
