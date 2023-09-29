@@ -48,59 +48,69 @@ export class TasksService {
     return this.taskModel.findByIdAndUpdate(id, updateTaskDto).exec();
   }
 
-  async move(id: string, moveTaskDto: MoveTaskDto) {
+  async moveInColumn(moveTaskDto: MoveTaskDto) {
+    const { source, destination } = moveTaskDto;
+    const column = await this.columnModel
+      .findById(source.droppableId)
+      .populate({
+        path: 'tasks',
+        options: {
+          sort: 'position',
+        },
+      })
+      .exec();
+
+    const [removed] = column.tasks.splice(source.index, 1);
+    column.tasks.splice(destination.index, 0, removed);
+
+    const promises = column.tasks.map((task, index) =>
+      task.position === index ? Promise.resolve() : this.taskModel.findByIdAndUpdate(task._id, { position: index }),
+    );
+
+    await Promise.all(promises);
+  }
+
+  async moveBetweenColumns(moveTaskDto: MoveTaskDto) {
+    const { source, destination } = moveTaskDto;
+    const columnSource = await this.columnModel
+      .findById(source.droppableId)
+      .populate({
+        path: 'tasks',
+        options: {
+          sort: 'position',
+        },
+      })
+      .exec();
+    const columnDestination = await this.columnModel
+      .findById(destination.droppableId)
+      .populate({
+        path: 'tasks',
+        options: {
+          sort: 'position',
+        },
+      })
+      .exec();
+
+    const [removed] = columnSource.tasks.splice(source.index, 1);
+    columnDestination.tasks.splice(destination.index, 0, removed);
+
+    const sourcePromises = columnSource.tasks.map((task, index) =>
+      task.position === index ? Promise.resolve() : this.taskModel.findByIdAndUpdate(task._id, { position: index }),
+    );
+
+    const destinationPromises = columnDestination.tasks.map((task, index) =>
+      task.position === index ? Promise.resolve() : this.taskModel.findByIdAndUpdate(task._id, { position: index }),
+    );
+    await Promise.all([columnSource.save(), columnDestination.save(), ...sourcePromises, ...destinationPromises]);
+  }
+
+  async move(moveTaskDto: MoveTaskDto) {
     const { source, destination } = moveTaskDto;
 
     if (source.droppableId === destination.droppableId) {
-      const column = await this.columnModel
-        .findById(source.droppableId)
-        .populate({
-          path: 'tasks',
-          options: {
-            sort: 'position',
-          },
-        })
-        .exec();
-
-      const [removed] = column.tasks.splice(source.index, 1);
-      column.tasks.splice(destination.index, 0, removed);
-
-      const promises = column.tasks.map((task, index) =>
-        task.position === index ? Promise.resolve() : this.taskModel.findByIdAndUpdate(task._id, { position: index }),
-      );
-
-      await Promise.all(promises);
+      await this.moveInColumn(moveTaskDto);
     } else {
-      const columnSource = await this.columnModel
-        .findById(source.droppableId)
-        .populate({
-          path: 'tasks',
-          options: {
-            sort: 'position',
-          },
-        })
-        .exec();
-      const columnDestination = await this.columnModel
-        .findById(destination.droppableId)
-        .populate({
-          path: 'tasks',
-          options: {
-            sort: 'position',
-          },
-        })
-        .exec();
-
-      const [removed] = columnSource.tasks.splice(source.index, 1);
-      columnDestination.tasks.splice(destination.index, 0, removed);
-
-      const sourcePromises = columnSource.tasks.map((task, index) =>
-        task.position === index ? Promise.resolve() : this.taskModel.findByIdAndUpdate(task._id, { position: index }),
-      );
-
-      const destinationPromises = columnDestination.tasks.map((task, index) =>
-        task.position === index ? Promise.resolve() : this.taskModel.findByIdAndUpdate(task._id, { position: index }),
-      );
-      await Promise.all([columnSource.save(), columnDestination.save(), ...sourcePromises, ...destinationPromises]);
+      await this.moveBetweenColumns(moveTaskDto);
     }
   }
   remove(id: string) {
