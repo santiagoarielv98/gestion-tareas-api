@@ -4,7 +4,7 @@ import { Task } from 'src/tasks/schemas/task.schema';
 
 export type ColumnDocument = HydratedDocument<Column>;
 
-@Schema()
+@Schema({ versionKey: false })
 export class Column extends mongoose.Document {
   @Prop({ required: true })
   title: string;

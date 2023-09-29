@@ -4,7 +4,7 @@ import { Task } from 'src/tasks/schemas/task.schema';
 
 export type SubtaskDocument = HydratedDocument<Subtask>;
 
-@Schema()
+@Schema({ versionKey: false })
 export class Subtask {
   @Prop()
   title: string;
