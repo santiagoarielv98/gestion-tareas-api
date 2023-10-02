@@ -1,11 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+import mongoose, { Document, HydratedDocument } from 'mongoose';
 import { Task } from 'src/tasks/schemas/task.schema';
 
 export type SubtaskDocument = HydratedDocument<Subtask>;
 
 @Schema({ versionKey: false })
-export class Subtask {
+export class Subtask extends Document {
   @Prop({ required: true })
   title: string;
 
