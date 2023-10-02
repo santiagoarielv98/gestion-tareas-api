@@ -5,9 +5,10 @@ import { TasksModule } from './tasks/tasks.module';
 import { SubtasksModule } from './subtasks/subtasks.module';
 import { ColumnsModule } from './columns/columns.module';
 import { SeedsService } from './seeds/seeds.service';
+import { KanbanModule } from './kanban/kanban.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), DatabaseModule, SubtasksModule, TasksModule, ColumnsModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), DatabaseModule, SubtasksModule, TasksModule, ColumnsModule, KanbanModule],
   controllers: [],
   providers: [SeedsService],
 })
