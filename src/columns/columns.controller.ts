@@ -1,16 +1,13 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+// services
 import { ColumnsService } from './columns.service';
-import { CreateColumnDto } from './dto/create-column.dto';
-import { UpdateColumnPositionDto } from './dto/update-column.dto';
+// dto
+import { CreateTaskDto } from 'src/tasks/dto/create-task.dto';
+import { UpdateColumnDto } from './dto/update-column.dto';
 
 @Controller('columns')
 export class ColumnsController {
   constructor(private readonly columnsService: ColumnsService) {}
-
-  @Post()
-  create(@Body() createColumnDto: CreateColumnDto) {
-    return this.columnsService.create(createColumnDto);
-  }
 
   @Get()
   findAll() {
@@ -23,17 +20,17 @@ export class ColumnsController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateColumnDto: CreateColumnDto) {
+  update(@Param('id') id: string, @Body() updateColumnDto: UpdateColumnDto) {
     return this.columnsService.update(id, updateColumnDto);
-  }
-
-  @Put(':id/position')
-  updatePosition(@Param('id') id: string, @Body() UpdateColumnPosition: UpdateColumnPositionDto) {
-    return this.columnsService.updatePosition(UpdateColumnPosition);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.columnsService.remove(id);
+  }
+
+  @Post(':id/tasks')
+  createTask(@Param('id') columnId: string, @Body() createTaskDto: CreateTaskDto | CreateTaskDto[]) {
+    return this.columnsService.createTask(columnId, createTaskDto);
   }
 }

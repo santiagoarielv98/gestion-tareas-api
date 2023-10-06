@@ -1,38 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Task } from 'src/tasks/schemas/task.schema';
-import { CreateSubtaskDto } from './dto/create-subtask.dto';
+// dto
 import { UpdateSubtaskDto } from './dto/update-subtask.dto';
-import { Subtask } from './schemas/subtask.schema';
+// schemas
+import { Subtask } from './schema/subtask.schema';
 
 @Injectable()
 export class SubtasksService {
-  constructor(
-    @InjectModel(Subtask.name) private subtaskModel: Model<Subtask>,
-    @InjectModel(Task.name) private taskModel: Model<Task>,
-  ) {}
-
-  async create(createSubtaskDto: CreateSubtaskDto) {
-    const count = await this.subtaskModel.countDocuments({ task: createSubtaskDto.task });
-
-    const newSubtask = await new this.subtaskModel({
-      ...createSubtaskDto,
-      position: count,
-    }).save();
-
-    await this.taskModel.findByIdAndUpdate(
-      newSubtask.task,
-      {
-        $push: {
-          subtasks: newSubtask._id,
-        },
-      },
-      { new: true },
-    );
-
-    return newSubtask;
-  }
+  constructor(@InjectModel('Subtask') private subtaskModel: Model<Subtask>) {}
 
   findAll() {
     return this.subtaskModel.find().exec();
@@ -43,10 +19,10 @@ export class SubtasksService {
   }
 
   update(id: string, updateSubtaskDto: UpdateSubtaskDto) {
-    return this.subtaskModel.findByIdAndUpdate(id, updateSubtaskDto, { new: true }).exec();
+    return this.subtaskModel.findByIdAndUpdate(id, updateSubtaskDto).exec();
   }
 
   remove(id: string) {
-    return this.subtaskModel.findByIdAndDelete(id).exec();
+    return this.subtaskModel.findByIdAndRemove(id).exec();
   }
 }

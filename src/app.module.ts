@@ -1,13 +1,25 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { DatabaseModule } from './database/database.module';
-import { TasksModule } from './tasks/tasks.module';
-import { SubtasksModule } from './subtasks/subtasks.module';
+import { MongooseModule } from '@nestjs/mongoose';
+// modules
+import { BoardsModule } from './boards/boards.module';
 import { ColumnsModule } from './columns/columns.module';
+import { SubtasksModule } from './subtasks/subtasks.module';
+import { TasksModule } from './tasks/tasks.module';
+// services
 import { SeedsService } from './seeds/seeds.service';
 
+const uri = process.env.MONGO_URI ?? 'mongodb://127.0.0.1:27017/kanban';
+
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), DatabaseModule, SubtasksModule, TasksModule, ColumnsModule],
+  imports: [
+    ConfigModule.forRoot(),
+    MongooseModule.forRoot(uri),
+    BoardsModule,
+    ColumnsModule,
+    TasksModule,
+    SubtasksModule,
+  ],
   controllers: [],
   providers: [SeedsService],
 })

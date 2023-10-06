@@ -1,118 +1,46 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Column } from 'src/columns/schemas/column.schema';
-import { CreateTaskDto } from './dto/create-task.dto';
-import { MoveTaskDto, UpdateTaskDto } from './dto/update-task.dto';
-import { Task } from './schemas/task.schema';
+// dto
+import { CreateSubtaskDto } from 'src/subtasks/dto/create-subtask.dto';
+import { UpdateTaskDto } from './dto/update-task.dto';
+// schemas
+import { Subtask } from 'src/subtasks/schema/subtask.schema';
+import { Task } from './schema/task.schema';
 
 @Injectable()
 export class TasksService {
   constructor(
-    @InjectModel(Task.name) private taskModel: Model<Task>,
-    @InjectModel(Column.name) private columnModel: Model<Column>,
+    @InjectModel('Task') private taskModel: Model<Task>,
+    @InjectModel('Subtask') private subtaskModel: Model<Subtask>,
   ) {}
-
-  async create(createTaskDto: CreateTaskDto): Promise<Task> {
-    const count = await this.taskModel.countDocuments({
-      column: createTaskDto.column,
-    });
-
-    const newTask = await new this.taskModel({
-      ...createTaskDto,
-      position: count,
-    }).save();
-
-    await this.columnModel.findByIdAndUpdate(
-      newTask.column,
-      {
-        $push: {
-          tasks: newTask._id,
-        },
-      },
-      { new: true },
-    );
-
-    return newTask;
-  }
-
   findAll() {
-    return this.taskModel.find().populate('subtasks').exec();
+    return this.taskModel.find().exec();
   }
 
   findOne(id: string) {
-    return this.taskModel.findById(id).populate('subtasks').exec();
+    return this.taskModel.findById(id).exec();
   }
 
-  async update(id: string, updateTaskDto: UpdateTaskDto) {
+  update(id: string, updateTaskDto: UpdateTaskDto) {
     return this.taskModel.findByIdAndUpdate(id, updateTaskDto).exec();
   }
 
-  async moveInColumn(moveTaskDto: MoveTaskDto) {
-    const { source, destination } = moveTaskDto;
-    const column = await this.columnModel
-      .findById(source.droppableId)
-      .populate({
-        path: 'tasks',
-        options: {
-          sort: 'position',
-        },
-      })
-      .exec();
-
-    const [removed] = column.tasks.splice(source.index, 1);
-    column.tasks.splice(destination.index, 0, removed);
-
-    const promises = column.tasks.map((task, index) =>
-      task.position === index ? Promise.resolve() : this.taskModel.findByIdAndUpdate(task._id, { position: index }),
-    );
-
-    await Promise.all(promises);
-  }
-
-  async moveBetweenColumns(moveTaskDto: MoveTaskDto) {
-    const { source, destination } = moveTaskDto;
-    const columnSource = await this.columnModel
-      .findById(source.droppableId)
-      .populate({
-        path: 'tasks',
-        options: {
-          sort: 'position',
-        },
-      })
-      .exec();
-    const columnDestination = await this.columnModel
-      .findById(destination.droppableId)
-      .populate({
-        path: 'tasks',
-        options: {
-          sort: 'position',
-        },
-      })
-      .exec();
-
-    const [removed] = columnSource.tasks.splice(source.index, 1);
-    columnDestination.tasks.splice(destination.index, 0, removed);
-
-    const sourcePromises = columnSource.tasks.map((task, index) =>
-      task.position === index ? Promise.resolve() : this.taskModel.findByIdAndUpdate(task._id, { position: index }),
-    );
-
-    const destinationPromises = columnDestination.tasks.map((task, index) =>
-      task.position === index ? Promise.resolve() : this.taskModel.findByIdAndUpdate(task._id, { position: index }),
-    );
-    await Promise.all([columnSource.save(), columnDestination.save(), ...sourcePromises, ...destinationPromises]);
-  }
-
-  async move(moveTaskDto: MoveTaskDto) {
-    const { source, destination } = moveTaskDto;
-    if (source.droppableId === destination.droppableId) {
-      await this.moveInColumn(moveTaskDto);
-    } else {
-      await this.moveBetweenColumns(moveTaskDto);
-    }
-  }
   remove(id: string) {
-    return this.taskModel.findByIdAndDelete(id).exec();
+    return this.taskModel.findByIdAndRemove(id).exec();
+  }
+
+  async createSubtask(id: string, createSubtaskDto: CreateSubtaskDto | CreateSubtaskDto[]) {
+    const subtasks: Subtask[] = Array.isArray(createSubtaskDto) ? createSubtaskDto : [createSubtaskDto];
+
+    const createdsubtasks = await this.taskModel.insertMany(subtasks.map((task) => ({ ...task, column: id })));
+
+    return this.taskModel.findByIdAndUpdate(id, {
+      $push: {
+        tasks: {
+          $each: createdsubtasks,
+        },
+      },
+    });
   }
 }
