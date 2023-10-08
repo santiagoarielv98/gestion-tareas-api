@@ -17,8 +17,8 @@ export class BoardsService {
   ) {}
 
   async create(createBoardDto: CreateBoardDto) {
-    const createdCat = new this.boardModel(createBoardDto);
-    return createdCat.save();
+    const createdBoard = new this.boardModel(createBoardDto);
+    return createdBoard.save();
   }
 
   async findAll() {
