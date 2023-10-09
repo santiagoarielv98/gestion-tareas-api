@@ -36,7 +36,7 @@ export class SeedsService implements OnApplicationBootstrap {
       columns: [],
     }));
 
-    const createdBoards = await this.boardModel.insertMany(boards);
+    const createdBoards = await this.boardModel.insertMany(boards, { ordered: true });
 
     await Promise.all(
       createdBoards.map(async (board) => {

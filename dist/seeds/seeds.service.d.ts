@@ -38,7 +38,7 @@ export declare class SeedsService implements OnApplicationBootstrap {
     seed(): Promise<void>;
     seedBoard(): Promise<import("mongoose").MergeType<import("mongoose").Document<unknown, {}, Board> & Board & {
         _id: import("mongoose").Types.ObjectId;
-    }, Omit<Board, "_id">>[]>;
+    }, Omit<Board[], "_id">>[]>;
     seedColumn(boardId: string): Promise<import("mongoose").MergeType<import("mongoose").Document<unknown, {}, Column> & Column & {
         _id: import("mongoose").Types.ObjectId;
     }, Omit<Column, "_id">>[]>;

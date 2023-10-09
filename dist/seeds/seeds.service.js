@@ -39,7 +39,7 @@ let SeedsService = class SeedsService {
             description: `Description ${i + 1}`,
             columns: [],
         }));
-        const createdBoards = await this.boardModel.insertMany(boards);
+        const createdBoards = await this.boardModel.insertMany(boards, { ordered: true });
         await Promise.all(createdBoards.map(async (board) => {
             const columns = await this.seedColumn(board._id.toString());
             await Promise.all(columns.map(async (column) => {

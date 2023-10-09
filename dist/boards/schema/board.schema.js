@@ -42,7 +42,17 @@ exports.BoardSchema.pre('save', function (next) {
         .countDocuments()
         .then((count) => {
         console.log(count);
-        this.position = count + 1;
+        this.position = count;
+        next();
+    })
+        .catch((err) => next(err));
+});
+exports.BoardSchema.pre('insertMany', function (next, docs) {
+    this.countDocuments()
+        .then((count) => {
+        docs.forEach((doc, i) => {
+            doc.position = count + i;
+        });
         next();
     })
         .catch((err) => next(err));

@@ -22,12 +22,22 @@ export const BoardSchema = SchemaFactory.createForClass(Board);
 
 BoardSchema.pre('save', function (next) {
   if (!this.isNew) return next();
-
   (this.constructor as mongoose.Model<Board>)
     .countDocuments()
     .then((count) => {
       console.log(count);
-      this.position = count + 1;
+      this.position = count;
+      next();
+    })
+    .catch((err) => next(err));
+});
+
+BoardSchema.pre('insertMany', function (next, docs) {
+  this.countDocuments()
+    .then((count) => {
+      docs.forEach((doc, i) => {
+        doc.position = count + i;
+      });
       next();
     })
     .catch((err) => next(err));
