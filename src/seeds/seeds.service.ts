@@ -33,7 +33,6 @@ export class SeedsService implements OnApplicationBootstrap {
     const boards: Board[] = Array.from({ length: 5 }).map((_, i) => ({
       name: `Board ${i + 1}`,
       description: `Description ${i + 1}`,
-      position: i,
       columns: [],
     }));
 
